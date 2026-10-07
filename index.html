@@ -1,0 +1,289 @@
+
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Birthday Boy Hours</title>
+  <link rel="stylesheet" href="style.css?v=999"/>
+  <link href="https://fonts.googleapis.com/css2?family=Emilys+Candy&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div id="playfield"></div>
+
+  <audio id="song" src="renai-circulation-full-original-bakemonogatari-op_eGaxmNZm(1).mp3" preload="auto"></audio>
+
+  <div class="stack">
+    <div id="topMsg" class="msg">Happy 24th</div>
+    <button id="glitterBtn">sec</button>
+    <div id="bottomMsg" class="msg">Birthday Mat!!</div>
+  </div>
+
+<script>
+  // --- config ---
+
+  const IMG_SRC = [
+    "2026_10_08_12h_Kleki.png",
+    "2026_10_08_12j_Kleki.png",
+    "2026_10_08_12l_Kleki.png",
+    "2026_10_08_12m_Kleki.png",
+    "2026_10_08_12n_Kleki.png",
+    "2026_10_08_12o_Kleki.png",
+    "2026_10_08_12p_Kleki.png",
+    "2026_10_08_12q_Kleki.png",
+    "2026_10_08_12s_Kleki.png",
+    "2026_10_08_12w_Kleki.png",
+    "2026_10_08_12x_Kleki(1).png",
+    "2026_10_08_12x_Kleki.png",
+    "2026_10_08_12z_Kleki.png",
+    "2026_10_08_13a_Kleki.png",
+    "2026_10_08_13b_Kleki.png",
+    "2026_10_08_13c_Kleki.png",
+    "2026_10_08_13d_Kleki(1).png",
+    "2026_10_08_13d_Kleki.png",
+    "2026_10_08_13f_Kleki(1).png",
+    "2026_10_08_13f_Kleki.png",
+    "2026_10_08_13g_Kleki.png",
+    "2026_10_08_13i_Kleki.png",
+    "2026_10_08_13j_Kleki.png",
+    "2026_10_08_13l_Kleki(1).png",
+    "2026_10_08_13l_Kleki.png",
+    "2026_10_08_13n_Kleki.png",
+    "2026_10_08_130_Kleki.png",
+    "2026_10_08_131_Kleki.png",
+    "2026_10_08_132_Kleki.png",
+    "2026_10_08_133_Kleki.png",
+    "2026_10_08_134_Kleki.png",
+    "2026_10_08_135_Kleki(1).png",
+    "2026_10_08_135_Kleki.png",
+    "2026_10_08_136_Kleki.png",
+    "2026_10_08_137_Kleki.png",
+    "2026_10_08_138_Kleki.png",
+    "2026_10_08_139_Kleki.png",
+    "2026_10_08_12123_Kleki.png"
+  ];
+
+  const GRAVITY = 2000, BOUNCE = 0.65, FRICTION = 0.98;
+  const MIN_SIZE = 100, MAX_SIZE = 300, SPAWN_COUNT = 1;
+  const FLOOR_GAP = 0;
+
+  // --- setup ---
+  const field = document.getElementById('playfield');
+  const btn = document.getElementById('glitterBtn');
+  const song = document.getElementById('song');
+
+  let W = field.clientWidth, H = field.clientHeight;
+  const bodies = [];
+
+  function r(a,b){
+    return Math.random() * (b-a) + a;
+  }
+
+  function pick(a){
+    return a[(Math.random()*a.length)|0];
+  }
+
+  function spawnOne(){
+    const img = document.createElement('img');
+    img.className = 'animal';
+
+    const size = r(MIN_SIZE, MAX_SIZE);
+    img.style.width = size + 'px';
+
+    const b = {
+      el: img,
+      x: r(0, Math.max(1, W - size)),
+      y: -size - r(200, 400),
+      vx: r(-300, 300),
+      vy: r(-200, 0),
+      w: size,
+      h: size
+    };
+
+    // Calculate the actual height of each image
+    img.onload = () => {
+      if (img.naturalWidth > 0) {
+        b.h = size * img.naturalHeight / img.naturalWidth;
+      }
+    };
+
+    img.src = pick(IMG_SRC);
+    field.appendChild(img);
+    bodies.push(b);
+  }
+
+  function spawnMany(n=SPAWN_COUNT){
+    for(let i=0; i<n; i++) spawnOne();
+  }
+
+  // --- physics loop ---
+  let last = performance.now();
+
+  function tick(now){
+    const dt = Math.min(0.032, (now-last)/1000);
+    last = now;
+
+    for(const b of bodies){
+      b.vy += GRAVITY * dt;
+      b.x += b.vx * dt;
+      b.y += b.vy * dt;
+
+      // Left wall
+      if(b.x < 0){
+        b.x = 0;
+        b.vx = -b.vx * BOUNCE * FRICTION;
+      }
+
+      // Right wall
+      if(b.x + b.w > W){
+        b.x = W - b.w;
+        b.vx = -b.vx * BOUNCE * FRICTION;
+      }
+
+      // Floor collision, slightly above bottom
+      if(b.y + b.h > H - FLOOR_GAP){
+        b.y = H - FLOOR_GAP - b.h;
+        b.vy = -b.vy * BOUNCE;
+        b.vx *= FRICTION;
+
+        if(Math.abs(b.vy) < 12) b.vy = 0;
+        if(Math.abs(b.vx) < 8) b.vx = 0;
+      }
+
+      b.el.style.transform =
+        `translate(${b.x}px, ${b.y}px)`;
+    }
+
+    requestAnimationFrame(tick);
+  }
+
+  requestAnimationFrame(tick);
+
+  // --- audio gating ---
+  btn.disabled = true;
+
+  function enableButton(){
+    if(btn.classList.contains('finished')) return;
+
+    if(btn.disabled){
+      btn.disabled = false;
+      btn.textContent = 'click';
+    }
+  }
+
+  if(song.readyState >= 4) enableButton();
+
+  song.addEventListener(
+    'canplaythrough',
+    enableButton,
+    { once: true }
+  );
+
+  setTimeout(enableButton, 4000);
+
+  // --- song-synced bursts/rain ---
+  const BURSTS = [
+    { at: 8.9, count: 60 },
+    { at: 16.18, count: 30 },
+    { at: 16.42, count: 30 }
+  ];
+
+  const RAIN_WINDOWS = [
+    { start: 24, end: 39, everyMs: 500, each: 1 },
+    { start: 40, end: 55.5, everyMs: 500, each: 2 },
+    { start: 56.3, end: 71, everyMs: 80, each: 3 },
+    { start: 72.2, end: 88, everyMs: 375, each: 3 }
+  ];
+
+  const firedBursts = new Set();
+  let rainTimer = null;
+
+  function enterRain(win){
+    exitRain();
+
+    rainTimer = setInterval(
+      () => spawnMany(win.each),
+      win.everyMs
+    );
+  }
+
+  function exitRain(){
+    if(rainTimer){
+      clearInterval(rainTimer);
+      rainTimer = null;
+    }
+  }
+
+  function activeWindow(t){
+    return RAIN_WINDOWS.find(
+      w => t >= w.start && t < w.end
+    ) || null;
+  }
+
+  song.addEventListener('timeupdate', () => {
+    const t = song.currentTime;
+
+    BURSTS.forEach((b, i) => {
+      if(!firedBursts.has(i) && t >= b.at){
+        spawnMany(b.count);
+        firedBursts.add(i);
+      }
+    });
+
+    const win = activeWindow(t);
+
+    if(win && !rainTimer) enterRain(win);
+    if(!win && rainTimer) exitRain();
+  });
+
+  song.addEventListener('pause', exitRain);
+
+  song.addEventListener('ended', () => {
+    exitRain();
+    firedBursts.clear();
+  });
+
+  // --- click handling ---
+  let clicks = 0;
+
+  btn.addEventListener('click', () => {
+    clicks += 1;
+
+    const left = 1000 - clicks;
+
+    // Fake countdown
+    if(left > 875){
+      btn.textContent = `click again (${left} left)`;
+      return;
+    }
+
+    // 25th click: surprise!
+    if(clicks === 125){
+      document.body.classList.add('glitter', 'show-texts');
+      btn.classList.add('btn--hotpink');
+      btn.textContent = 'just kidding <3';
+
+      spawnMany();
+
+      if(song.paused){
+        firedBursts.clear();
+        exitRain();
+        song.play().catch(() => {});
+      }
+
+      return;
+    }
+
+    // Subsequent clicks spawn more hyraxes
+    spawnMany();
+  });
+
+  // --- resize ---
+  window.addEventListener('resize', () => {
+    W = field.clientWidth;
+    H = field.clientHeight;
+  });
+
+</script>
+</body>
+</html>

@@ -1,0 +1,113 @@
+
+html, body {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  background: #fff;
+}
+
+body.glitter {
+  background: url("hyraxaerofull.jpeg") center / cover no-repeat;
+}
+
+#playfield {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+}
+
+.animal {
+  position: absolute;
+  left: 0;
+  top: 0;
+  will-change: transform;
+  user-select: none;
+}
+
+button.btn--hotpink,
+button.btn--hotpink.finished:disabled {
+  font-size: 1.125rem;
+  padding: 0.75rem 1.25rem;
+  background: #1673b1;
+  color: #edf1f5;
+  -webkit-text-fill-color: #edf1f5;
+  border: 2px solid #094e80;
+  border-radius: 6%;
+  font-family: "Emilys Candy", system-ui, sans-serif;
+  cursor: pointer;
+  z-index: 1;
+  opacity: 1;
+}
+
+button {
+  font-size: 1.125rem;
+  padding: 0.75rem 1.25rem;
+  cursor: pointer;
+  z-index: 1;
+}
+
+button.finished {
+  cursor: default;
+}
+
+.stack {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.25rem;
+  z-index: 1;
+  position: relative;
+}
+
+/* Messages */
+.msg {
+  visibility: hidden;
+  pointer-events: none;
+  font-size: clamp(2rem, 6vw, 5rem);
+  font-weight: 700;
+  line-height: 1.15;
+  padding: 0.1em 0;
+  text-align: center;
+}
+
+.show-texts .msg {
+  visibility: visible;
+}
+
+#bottomMsg {
+  margin-top: clamp(3rem, 10vh, 14rem);
+  font-family: "Emilys Candy", cursive, system-ui, sans-serif;
+  font-weight: 400;
+  font-size: clamp(4rem, 14vw, 16rem);
+}
+
+#topMsg {
+  margin-bottom: clamp(3rem, 10vh, 14rem);
+  font-family: "Emilys Candy", cursive, system-ui, sans-serif;
+  font-weight: 400;
+  font-size: clamp(4rem, 12vw, 14rem);
+}
+
+/* Full rainbow on EACH heading */
+#topMsg,
+#bottomMsg {
+  background: linear-gradient(
+    90deg,
+    red,
+    orange,
+    yellow,
+    lime,
+    cyan,
+    blue,
+    violet
+  );
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+  -webkit-text-fill-color: transparent;
+}
