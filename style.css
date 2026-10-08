@@ -111,3 +111,8 @@ button.finished {
   color: transparent;
   -webkit-text-fill-color: transparent;
 }
+
+body {
+  user-select: none;
+  -webkit-user-select: none;
+}
